@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import type { PageResult } from '@/lib/types'
 
 interface Props {
@@ -17,6 +17,24 @@ type ViewMode = 'side-by-side' | 'diff' | 'slider'
 export default function DiffViewer({ runId, slug, result, baseUrlA, baseUrlB, onClose }: Props) {
   const [mode, setMode] = useState<ViewMode>('side-by-side')
   const [sliderPos, setSliderPos] = useState(50)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width))
+    setSliderPos((x / rect.width) * 100)
+  }, [])
+
+  const handleMouseUp = useCallback(() => {
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }, [handleMouseMove])
+
+  const handleMouseDown = useCallback(() => {
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [handleMouseMove, handleMouseUp])
 
   const filename = slug === '/' ? 'home.png' : `${slug.replace(/^\//, '').replace(/\//g, '-')}.png`
   const imgA = `/api/image/${runId}/screenshots/a/${filename}`
@@ -84,7 +102,7 @@ export default function DiffViewer({ runId, slug, result, baseUrlA, baseUrlB, on
 
           {mode === 'slider' && (
             <div className="relative select-none">
-              <div className="relative border rounded">
+              <div ref={containerRef} className="relative border rounded cursor-ew-resize" onMouseDown={handleMouseDown}>
                 {/* Image B (background) */}
                 <img src={imgB} alt="Version B" className="w-full block" />
                 {/* Image A (foreground, clipped) */}
@@ -101,7 +119,7 @@ export default function DiffViewer({ runId, slug, result, baseUrlA, baseUrlB, on
                 >
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 8l-4 4 4 4M15 8l4 4-4 4" />
                     </svg>
                   </div>
                 </div>
