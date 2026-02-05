@@ -25,6 +25,7 @@ export async function takeScreenshot(
   const b = await getBrowser()
   const context = await b.newContext({
     viewport: config.viewport,
+    ignoreHTTPSErrors: true,
   })
   const page = await context.newPage()
 
