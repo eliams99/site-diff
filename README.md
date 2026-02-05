@@ -65,8 +65,8 @@ data/
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| viewport | 1280x720 | Browser viewport size |
-| fullPage | true | Capture entire scrollable page |
+| viewport | 1280x720 | Browser window width (affects responsive layouts) |
+| fullPage | true | Capture entire scroll height (default) |
 | delay | 500ms | Wait after page load for animations |
 | threshold | 0.1 | pixelmatch sensitivity (0-1) |
 | hideSelectors | [] | CSS selectors to hide (e.g., `.cookie-banner`) |
