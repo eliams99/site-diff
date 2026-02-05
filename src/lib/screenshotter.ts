@@ -5,7 +5,9 @@ let browser: Browser | null = null
 
 async function getBrowser(): Promise<Browser> {
   if (!browser) {
-    browser = await chromium.launch()
+    browser = await chromium.launch({
+      args: ['--ignore-certificate-errors'],
+    })
   }
   return browser
 }
