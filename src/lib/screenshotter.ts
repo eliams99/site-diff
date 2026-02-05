@@ -32,7 +32,22 @@ export async function takeScreenshot(
   const page = await context.newPage()
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle' })
+    // Try original URL first, fall back to http if https fails
+    let targetUrl = url
+    try {
+      await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30000 })
+    } catch (err) {
+      const isSSLError = err instanceof Error &&
+        (err.message.includes('ERR_SSL') || err.message.includes('SSL_PROTOCOL'))
+
+      if (isSSLError && targetUrl.startsWith('https://')) {
+        // Retry with http://
+        targetUrl = targetUrl.replace('https://', 'http://')
+        await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30000 })
+      } else {
+        throw err
+      }
+    }
 
     if (config.hideSelectors?.length) {
       await hideElements(page, config.hideSelectors)
