@@ -84,23 +84,27 @@ export default function DiffViewer({ runId, slug, result, baseUrlA, baseUrlB, on
 
           {mode === 'slider' && (
             <div className="relative select-none">
-              <div className="relative overflow-hidden border rounded">
-                <img src={imgB} alt="Version B" className="w-full" />
-                <div
-                  className="absolute top-0 left-0 h-full overflow-hidden"
-                  style={{ width: `${sliderPos}%` }}
-                >
-                  <img
-                    src={imgA}
-                    alt="Version A"
-                    className="h-full object-cover object-left"
-                    style={{ width: `${100 / (sliderPos / 100)}%` }}
-                  />
-                </div>
-                <div
-                  className="absolute top-0 bottom-0 w-1 bg-blue-500 cursor-ew-resize"
-                  style={{ left: `${sliderPos}%` }}
+              <div className="relative border rounded">
+                {/* Image B (background) */}
+                <img src={imgB} alt="Version B" className="w-full block" />
+                {/* Image A (foreground, clipped) */}
+                <img
+                  src={imgA}
+                  alt="Version A"
+                  className="absolute top-0 left-0 w-full block"
+                  style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
                 />
+                {/* Slider handle */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-blue-500 cursor-ew-resize"
+                  style={{ left: `${sliderPos}%` }}
+                >
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <input
                 type="range"
