@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import CompareForm from '@/components/CompareForm'
 import { listRuns } from '@/lib/storage'
 import Link from 'next/link'
@@ -14,7 +15,9 @@ export default async function Home() {
 
       <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">New Comparison</h2>
-        <CompareForm />
+        <Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded" />}>
+          <CompareForm />
+        </Suspense>
       </div>
 
       {runs.length > 0 && (

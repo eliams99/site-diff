@@ -25,14 +25,22 @@ export default async function RunPage({
         </Link>
       </div>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{run.id}</h1>
-        <div className="text-gray-600 text-sm mt-1">
-          {run.baseUrlA} vs {run.baseUrlB}
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{run.id}</h1>
+          <div className="text-gray-600 text-sm mt-1">
+            {run.baseUrlA} vs {run.baseUrlB}
+          </div>
+          <div className="text-gray-400 text-xs mt-1">
+            {new Date(run.createdAt).toLocaleString()}
+          </div>
         </div>
-        <div className="text-gray-400 text-xs mt-1">
-          {new Date(run.createdAt).toLocaleString()}
-        </div>
+        <Link
+          href={`/?baseUrlA=${encodeURIComponent(run.baseUrlA)}&baseUrlB=${encodeURIComponent(run.baseUrlB)}&slugs=${encodeURIComponent(run.results.map(r => r.slug).join(','))}`}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+        >
+          Run Again
+        </Link>
       </div>
 
       <ResultsGrid run={run} />

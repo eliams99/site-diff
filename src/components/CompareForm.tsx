@@ -1,13 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function CompareForm() {
+interface Props {
+  initialBaseUrlA?: string
+  initialBaseUrlB?: string
+  initialSlugs?: string[]
+}
+
+export default function CompareForm({ initialBaseUrlA, initialBaseUrlB, initialSlugs }: Props = {}) {
   const router = useRouter()
-  const [baseUrlA, setBaseUrlA] = useState('')
-  const [baseUrlB, setBaseUrlB] = useState('')
-  const [slugsText, setSlugsText] = useState('/')
+  const searchParams = useSearchParams()
+
+  // Priority: props > URL params > defaults
+  const [baseUrlA, setBaseUrlA] = useState(
+    initialBaseUrlA || searchParams.get('baseUrlA') || ''
+  )
+  const [baseUrlB, setBaseUrlB] = useState(
+    initialBaseUrlB || searchParams.get('baseUrlB') || ''
+  )
+  const [slugsText, setSlugsText] = useState(
+    initialSlugs?.join('\n') || searchParams.get('slugs')?.split(',').join('\n') || '/'
+  )
   const [sitemapUrl, setSitemapUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingSitemap, setLoadingSitemap] = useState(false)
