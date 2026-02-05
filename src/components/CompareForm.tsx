@@ -1,32 +1,77 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-interface Props {
-  initialBaseUrlA?: string
-  initialBaseUrlB?: string
-  initialSlugs?: string[]
+const STORAGE_KEY = 'site-diff-form'
+
+interface FormState {
+  baseUrlA: string
+  baseUrlB: string
+  slugsText: string
+  sitemapUrl: string
 }
 
-export default function CompareForm({ initialBaseUrlA, initialBaseUrlB, initialSlugs }: Props = {}) {
+function loadFromStorage(): FormState | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? JSON.parse(saved) : null
+  } catch {
+    return null
+  }
+}
+
+function saveToStorage(state: FormState) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch {}
+}
+
+export default function CompareForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [mounted, setMounted] = useState(false)
 
-  // Priority: props > URL params > defaults
-  const [baseUrlA, setBaseUrlA] = useState(
-    initialBaseUrlA || searchParams.get('baseUrlA') || ''
-  )
-  const [baseUrlB, setBaseUrlB] = useState(
-    initialBaseUrlB || searchParams.get('baseUrlB') || ''
-  )
-  const [slugsText, setSlugsText] = useState(
-    initialSlugs?.join('\n') || searchParams.get('slugs')?.split(',').join('\n') || '/'
-  )
+  // Start with empty/default, hydrate from storage after mount
+  const [baseUrlA, setBaseUrlA] = useState('')
+  const [baseUrlB, setBaseUrlB] = useState('')
+  const [slugsText, setSlugsText] = useState('/')
   const [sitemapUrl, setSitemapUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingSitemap, setLoadingSitemap] = useState(false)
   const [error, setError] = useState('')
+
+  // Load from URL params or localStorage on mount
+  useEffect(() => {
+    const urlA = searchParams.get('baseUrlA')
+    const urlB = searchParams.get('baseUrlB')
+    const urlSlugs = searchParams.get('slugs')
+
+    if (urlA || urlB || urlSlugs) {
+      // URL params take priority (from "Run Again")
+      if (urlA) setBaseUrlA(urlA)
+      if (urlB) setBaseUrlB(urlB)
+      if (urlSlugs) setSlugsText(urlSlugs.split(',').join('\n'))
+    } else {
+      // Fall back to localStorage
+      const saved = loadFromStorage()
+      if (saved) {
+        setBaseUrlA(saved.baseUrlA)
+        setBaseUrlB(saved.baseUrlB)
+        setSlugsText(saved.slugsText)
+        setSitemapUrl(saved.sitemapUrl)
+      }
+    }
+    setMounted(true)
+  }, [searchParams])
+
+  // Save to localStorage on change
+  useEffect(() => {
+    if (!mounted) return
+    saveToStorage({ baseUrlA, baseUrlB, slugsText, sitemapUrl })
+  }, [baseUrlA, baseUrlB, slugsText, sitemapUrl, mounted])
 
   const handleFetchSitemap = async () => {
     if (!sitemapUrl) return
