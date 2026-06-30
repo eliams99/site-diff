@@ -29,13 +29,14 @@ export async function takeScreenshot(
     viewport: config.viewport,
     ignoreHTTPSErrors: true,
   })
+
   const page = await context.newPage()
 
   try {
     // Try original URL first, fall back to http if https fails
     let targetUrl = url
     try {
-      await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30000 })
+      await page.goto(targetUrl, { waitUntil: 'load', timeout: 30000 })
     } catch (err) {
       const isSSLError = err instanceof Error &&
         (err.message.includes('ERR_SSL') || err.message.includes('SSL_PROTOCOL'))
@@ -43,7 +44,7 @@ export async function takeScreenshot(
       if (isSSLError && targetUrl.startsWith('https://')) {
         // Retry with http://
         targetUrl = targetUrl.replace('https://', 'http://')
-        await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30000 })
+        await page.goto(targetUrl, { waitUntil: 'load', timeout: 30000 })
       } else {
         throw err
       }

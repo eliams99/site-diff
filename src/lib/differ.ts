@@ -68,13 +68,10 @@ function padImage(img: PNG, targetWidth: number, targetHeight: number): PNG {
 
   const padded = new PNG({ width: targetWidth, height: targetHeight, fill: true })
 
-  // Fill with white
-  for (let i = 0; i < padded.data.length; i += 4) {
-    padded.data[i] = 255     // R
-    padded.data[i + 1] = 255 // G
-    padded.data[i + 2] = 255 // B
-    padded.data[i + 3] = 255 // A
-  }
+  // Fill with opaque white. Buffer.fill(255) is a native memset — sets every
+  // RGBA byte to 255 in one pass, far faster than a per-pixel JS loop on the
+  // millions of pixels a full-page screenshot produces.
+  padded.data.fill(255)
 
   // Copy original image
   PNG.bitblt(img, padded, 0, 0, img.width, img.height, 0, 0)
