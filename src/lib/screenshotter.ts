@@ -76,30 +76,3 @@ async function hideElements(page: Page, selectors: string[]): Promise<void> {
   }
 }
 
-export async function screenshotPages(
-  baseUrl: string,
-  slugs: string[],
-  outputDir: string,
-  config: ComparisonConfig,
-  onProgress?: (slug: string, index: number) => void
-): Promise<Map<string, string | Error>> {
-  const results = new Map<string, string | Error>()
-
-  for (let i = 0; i < slugs.length; i++) {
-    const slug = slugs[i]
-    const url = new URL(slug, baseUrl).toString()
-    const filename = slug === '/' ? 'home.png' : `${slug.replace(/^\//, '').replace(/\//g, '-')}.png`
-    const outputPath = `${outputDir}/${filename}`
-
-    onProgress?.(slug, i)
-
-    try {
-      await takeScreenshot(url, outputPath, config)
-      results.set(slug, outputPath)
-    } catch (error) {
-      results.set(slug, error instanceof Error ? error : new Error(String(error)))
-    }
-  }
-
-  return results
-}

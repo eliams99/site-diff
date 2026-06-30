@@ -3,6 +3,11 @@ import { PNG } from 'pngjs'
 import pixelmatch from 'pixelmatch'
 import type { PageResult } from './types'
 
+// Diff overlay colors. pixelmatch uses diffColorAlt when the pixel is darker
+// in B than in A, and diffColor otherwise.
+const DIFF_COLOR_REMOVED: [number, number, number] = [255, 0, 0] // B lighter than A
+const DIFF_COLOR_ADDED: [number, number, number] = [0, 180, 80]  // B darker than A
+
 export interface DiffResult {
   mismatchPixels: number
   mismatchPercent: number
@@ -41,7 +46,11 @@ export async function diffImages(
     diff.data,
     width,
     height,
-    { threshold }
+    {
+      threshold,
+      diffColor: DIFF_COLOR_REMOVED,
+      diffColorAlt: DIFF_COLOR_ADDED,
+    }
   )
 
   await fs.writeFile(diffOutputPath, PNG.sync.write(diff))
