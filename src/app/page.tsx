@@ -37,10 +37,10 @@ export default async function Home() {
                 >
                   <div>
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="text-gray-400">{new Date(run.createdAt).toLocaleDateString()}</span>
+                      <span className="text-gray-400">{new Date(run.createdAt).toLocaleDateString('en-GB')}</span>
                       <span className="text-gray-300">·</span>
                       <span className="text-gray-400">
-                        {new Date(run.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(run.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <span className="text-gray-300">·</span>
                       <span className="font-mono font-medium">{parseShortId(run.id)}</span>

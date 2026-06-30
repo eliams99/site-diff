@@ -15,8 +15,8 @@ export async function generateMetadata({
   const run = await getMetadata(id)
   if (!run) return { title: 'Run not found · Site Diff' }
   const d = new Date(run.createdAt)
-  const date = d.toLocaleDateString()
-  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const date = d.toLocaleDateString('en-GB')
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
   return { title: `${date} ${time} · Site Diff` }
 }
 
@@ -47,7 +47,7 @@ export default async function RunPage({
             {run.baseUrlA} vs {run.baseUrlB}
           </div>
           <div className="text-gray-400 text-xs mt-1">
-            {new Date(run.createdAt).toLocaleString()}
+            {new Date(run.createdAt).toLocaleString('en-GB')}
           </div>
         </div>
         <Link
