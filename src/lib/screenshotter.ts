@@ -49,6 +49,18 @@ export async function takeScreenshot(
       }
     }
 
+    // Dismiss consent banners / modals by clicking (e.g. OneTrust accept button).
+    // Best-effort: the banner may not appear on every page or environment.
+    if (config.clickSelectors?.length) {
+      for (const selector of config.clickSelectors) {
+        try {
+          await page.click(selector, { timeout: 5000 })
+        } catch {
+          // Selector not present — nothing to dismiss, continue.
+        }
+      }
+    }
+
     if (config.hideSelectors?.length) {
       await hideElements(page, config.hideSelectors)
     }
