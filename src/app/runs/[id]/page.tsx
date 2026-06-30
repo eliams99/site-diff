@@ -1,9 +1,24 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getMetadata } from '@/lib/storage'
 import ResultsGrid from '@/components/ResultsGrid'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const run = await getMetadata(id)
+  if (!run) return { title: 'Run not found · Site Diff' }
+  const d = new Date(run.createdAt)
+  const date = d.toLocaleDateString()
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return { title: `${date} ${time} · Site Diff` }
+}
 
 export default async function RunPage({
   params

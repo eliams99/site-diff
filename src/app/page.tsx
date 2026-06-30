@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import CompareForm from '@/components/CompareForm'
 import { listRuns } from '@/lib/storage'
+import { parseShortId } from '@/lib/runResults'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -35,17 +36,22 @@ export default async function Home() {
                   className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-md border"
                 >
                   <div>
-                    <div className="font-medium text-sm">{run.id}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-gray-400">{new Date(run.createdAt).toLocaleDateString()}</span>
+                      <span className="text-gray-300">·</span>
+                      <span className="text-gray-400">
+                        {new Date(run.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className="text-gray-300">·</span>
+                      <span className="font-mono font-medium">{parseShortId(run.id)}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
                       {run.baseUrlA} vs {run.baseUrlB}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <span className="text-green-600">{matches} ✓</span>
                     <span className="text-red-600">{diffs} ✗</span>
-                    <span className="text-gray-400">
-                      {new Date(run.createdAt).toLocaleDateString()}
-                    </span>
                   </div>
                 </Link>
               )
