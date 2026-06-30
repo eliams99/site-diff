@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,24 +8,24 @@ import {
   Maximize2,
   X,
   ChevronsLeftRight,
-} from "lucide-react";
-import type { PageResult } from "@/lib/types";
+} from 'lucide-react'
+import type { PageResult } from '@/lib/types'
 
 interface Props {
-  runId: string;
-  slug: string;
-  result: PageResult;
-  baseUrlA: string;
-  baseUrlB: string;
-  checked: boolean;
-  onToggleChecked: (slug: string, checked: boolean) => void;
-  onClose: () => void;
-  onPrev?: () => void;
-  onNext?: () => void;
-  position?: { index: number; total: number };
+  runId: string
+  slug: string
+  result: PageResult
+  baseUrlA: string
+  baseUrlB: string
+  checked: boolean
+  onToggleChecked: (slug: string, checked: boolean) => void
+  onClose: () => void
+  onPrev?: () => void
+  onNext?: () => void
+  position?: { index: number; total: number }
 }
 
-type ViewMode = "side-by-side" | "diff" | "slider";
+type ViewMode = 'side-by-side' | 'diff' | 'slider'
 
 export default function DiffViewer({
   runId,
@@ -41,58 +41,58 @@ export default function DiffViewer({
   position,
 }: Props) {
   // Full page URLs for the current slug, matching how the screenshots were taken (runner.ts).
-  const pageUrlA = new URL(slug, baseUrlA).toString();
-  const pageUrlB = new URL(slug, baseUrlB).toString();
-  const [mode, setMode] = useState<ViewMode>("side-by-side");
-  const [sliderPos, setSliderPos] = useState(50);
-  const [expanded, setExpanded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const pageUrlA = new URL(slug, baseUrlA).toString()
+  const pageUrlB = new URL(slug, baseUrlB).toString()
+  const [mode, setMode] = useState<ViewMode>('side-by-side')
+  const [sliderPos, setSliderPos] = useState(50)
+  const [expanded, setExpanded] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    setSliderPos((x / rect.width) * 100);
-  }, []);
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width))
+    setSliderPos((x / rect.width) * 100)
+  }, [])
 
   const handleMouseUp = useCallback(() => {
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-  }, [handleMouseMove]);
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }, [handleMouseMove])
 
   const handleMouseDown = useCallback(() => {
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  }, [handleMouseMove, handleMouseUp]);
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [handleMouseMove, handleMouseUp])
 
   useEffect(() => {
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [handleMouseMove, handleMouseUp]);
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [handleMouseMove, handleMouseUp])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't hijack arrow keys while the user is adjusting the slider.
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      if (e.key === "ArrowLeft") onPrev?.();
-      else if (e.key === "ArrowRight") onNext?.();
-      else if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onPrev, onNext, onClose]);
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (e.key === 'ArrowLeft') onPrev?.()
+      else if (e.key === 'ArrowRight') onNext?.()
+      else if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onPrev, onNext, onClose])
 
   const filename =
-    slug === "/"
-      ? "home.png"
-      : `${slug.replace(/^\//, "").replace(/\//g, "-")}.png`;
-  const v = `?v=${result.version ?? 1}`;
-  const imgA = `/api/image/${runId}/screenshots/a/${filename}${v}`;
-  const imgB = `/api/image/${runId}/screenshots/b/${filename}${v}`;
-  const imgDiff = `/api/image/${runId}/diffs/${filename}${v}`;
+    slug === '/'
+      ? 'home.png'
+      : `${slug.replace(/^\//, '').replace(/\//g, '-')}.png`
+  const v = `?v=${result.version ?? 1}`
+  const imgA = `/api/image/${runId}/screenshots/a/${filename}${v}`
+  const imgB = `/api/image/${runId}/screenshots/b/${filename}${v}`
+  const imgDiff = `/api/image/${runId}/diffs/${filename}${v}`
 
   return (
     <div
@@ -102,8 +102,8 @@ export default function DiffViewer({
       {onPrev && (
         <button
           onClick={(e) => {
-            e.stopPropagation();
-            onPrev();
+            e.stopPropagation()
+            onPrev()
           }}
           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg"
           title="Previous (←)"
@@ -115,8 +115,8 @@ export default function DiffViewer({
       {onNext && (
         <button
           onClick={(e) => {
-            e.stopPropagation();
-            onNext();
+            e.stopPropagation()
+            onNext()
           }}
           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg"
           title="Next (→)"
@@ -127,7 +127,7 @@ export default function DiffViewer({
       )}
       <div
         className={`bg-white rounded-lg max-h-[90vh] flex flex-col ${
-          expanded ? "w-[90vw] max-w-none" : "w-full max-w-6xl"
+          expanded ? 'w-[90vw] max-w-none' : 'w-full max-w-6xl'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -148,8 +148,8 @@ export default function DiffViewer({
             <button
               onClick={() => setExpanded((e) => !e)}
               className="p-2 hover:bg-gray-100 rounded-md"
-              title={expanded ? "Shrink" : "Expand to 90% width"}
-              aria-label={expanded ? "Shrink" : "Expand"}
+              title={expanded ? 'Shrink' : 'Expand to 90% width'}
+              aria-label={expanded ? 'Shrink' : 'Expand'}
             >
               {expanded ? (
                 <Minimize2 className="w-5 h-5" />
@@ -170,19 +170,19 @@ export default function DiffViewer({
         {/* Tabs + reviewed checkbox */}
         <div className="flex items-center justify-between gap-2 p-4 border-b">
           <div className="flex gap-2">
-            {(["side-by-side", "diff", "slider"] as ViewMode[]).map((m) => (
+            {(['side-by-side', 'diff', 'slider'] as ViewMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
                 className={`px-4 py-2 rounded-md text-sm font-medium ${
-                  mode === m ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+                  mode === m ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'
                 }`}
               >
-                {m === "side-by-side"
-                  ? "Side by Side"
-                  : m === "diff"
-                    ? "Diff Overlay"
-                    : "Slider"}
+                {m === 'side-by-side'
+                  ? 'Side by Side'
+                  : m === 'diff'
+                    ? 'Diff Overlay'
+                    : 'Slider'}
               </button>
             ))}
           </div>
@@ -199,7 +199,7 @@ export default function DiffViewer({
 
         {/* Content — all panels stay mounted; inactive ones are hidden to avoid image reload blink. */}
         <div className="flex-1 overflow-auto pb-4 px-4">
-          <div className={mode === "side-by-side" ? "" : "hidden"}>
+          <div className={mode === 'side-by-side' ? '' : 'hidden'}>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="sticky top-0 z-10 bg-white text-sm text-gray-500 py-2 flex items-center gap-2">
@@ -240,19 +240,19 @@ export default function DiffViewer({
             </div>
           </div>
 
-          <div className={mode === "diff" ? "" : "hidden"}>
+          <div className={mode === 'diff' ? '' : 'hidden'}>
             <div className="sticky top-0 z-10 bg-white flex items-center gap-4 py-2 text-sm">
               <span className="flex items-center gap-2">
                 <span
                   className="w-3 h-3 rounded-sm"
-                  style={{ backgroundColor: "#00b450" }}
+                  style={{ backgroundColor: '#00b450' }}
                 />
                 Added in B (darker than A)
               </span>
               <span className="flex items-center gap-2">
                 <span
                   className="w-3 h-3 rounded-sm"
-                  style={{ backgroundColor: "#ff0000" }}
+                  style={{ backgroundColor: '#ff0000' }}
                 />
                 Removed in B (lighter than A)
               </span>
@@ -266,7 +266,7 @@ export default function DiffViewer({
             </div>
           </div>
 
-          <div className={mode === "slider" ? "" : "hidden"}>
+          <div className={mode === 'slider' ? '' : 'hidden'}>
             <div className="sticky top-0 z-10 bg-white py-2">
               <input
                 type="range"
@@ -308,5 +308,5 @@ export default function DiffViewer({
         </div>
       </div>
     </div>
-  );
+  )
 }

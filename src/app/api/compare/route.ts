@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!baseUrlA || !baseUrlB || !slugs?.length) {
     return NextResponse.json(
       { error: 'Missing required fields: baseUrlA, baseUrlB, slugs' },
-      { status: 400 }
+      { status: 400 },
     )
   }
 

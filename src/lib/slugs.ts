@@ -3,7 +3,10 @@
  * Trims entries, drops empties, removes duplicates, and preserves
  * first-seen order (selected first, then manual-only).
  */
-export function mergeSlugs(selected: Iterable<string>, manualText: string): string[] {
+export function mergeSlugs(
+  selected: Iterable<string>,
+  manualText: string,
+): string[] {
   const manual = manualText.split('\n')
   const seen = new Set<string>()
   const out: string[] = []

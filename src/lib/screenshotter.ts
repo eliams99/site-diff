@@ -22,7 +22,7 @@ export async function closeBrowser(): Promise<void> {
 export async function takeScreenshot(
   url: string,
   outputPath: string,
-  config: ComparisonConfig
+  config: ComparisonConfig,
 ): Promise<void> {
   const b = await getBrowser()
   const context = await b.newContext({
@@ -38,8 +38,10 @@ export async function takeScreenshot(
     try {
       await page.goto(targetUrl, { waitUntil: 'load', timeout: 30000 })
     } catch (err) {
-      const isSSLError = err instanceof Error &&
-        (err.message.includes('ERR_SSL') || err.message.includes('SSL_PROTOCOL'))
+      const isSSLError =
+        err instanceof Error &&
+        (err.message.includes('ERR_SSL') ||
+          err.message.includes('SSL_PROTOCOL'))
 
       if (isSSLError && targetUrl.startsWith('https://')) {
         // Retry with http://
@@ -88,4 +90,3 @@ async function hideElements(page: Page, selectors: string[]): Promise<void> {
     }, selector)
   }
 }
-

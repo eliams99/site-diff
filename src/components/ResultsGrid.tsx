@@ -23,7 +23,8 @@ export default function ResultsGrid({ run: initialRun }: Props) {
   const pending = getPendingSlugs(run)
   const errorSlugs = getErrorSlugs(run)
   const isRerunning = (slug: string) => rerunning.current.has(slug)
-  const shouldPoll = run.status === 'running' || pending.length > 0 || rerunning.current.size > 0
+  const shouldPoll =
+    run.status === 'running' || pending.length > 0 || rerunning.current.size > 0
 
   const refetch = useCallback(async () => {
     const res = await fetch(`/api/runs/${run.id}`, { cache: 'no-store' })
@@ -63,14 +64,16 @@ export default function ResultsGrid({ run: initialRun }: Props) {
       })
       refetch()
     },
-    [run.id, run.results, refetch]
+    [run.id, run.results, refetch],
   )
 
   const toggleChecked = useCallback(
     async (slug: string, checked: boolean) => {
       setRun((prev) => ({
         ...prev,
-        results: prev.results.map((r) => (r.slug === slug ? { ...r, checked } : r)),
+        results: prev.results.map((r) =>
+          r.slug === slug ? { ...r, checked } : r,
+        ),
       }))
       await fetch(`/api/runs/${run.id}`, {
         method: 'PATCH',
@@ -78,7 +81,7 @@ export default function ResultsGrid({ run: initialRun }: Props) {
         body: JSON.stringify({ slug, checked }),
       })
     },
-    [run.id]
+    [run.id],
   )
 
   // Slugs the modal can navigate between: those with a loaded, non-re-running result.
@@ -159,16 +162,26 @@ export default function ResultsGrid({ run: initialRun }: Props) {
           result={run.results.find((r) => r.slug === selectedSlug)!}
           baseUrlA={run.baseUrlA}
           baseUrlB={run.baseUrlB}
-          checked={Boolean(run.results.find((r) => r.slug === selectedSlug)!.checked)}
+          checked={Boolean(
+            run.results.find((r) => r.slug === selectedSlug)!.checked,
+          )}
           onToggleChecked={toggleChecked}
           onClose={() => setSelectedSlug(null)}
-          onPrev={currentIndex > 0 ? () => setSelectedSlug(openableSlugs[currentIndex - 1]) : undefined}
+          onPrev={
+            currentIndex > 0
+              ? () => setSelectedSlug(openableSlugs[currentIndex - 1])
+              : undefined
+          }
           onNext={
             currentIndex >= 0 && currentIndex < openableSlugs.length - 1
               ? () => setSelectedSlug(openableSlugs[currentIndex + 1])
               : undefined
           }
-          position={currentIndex >= 0 ? { index: currentIndex + 1, total: openableSlugs.length } : undefined}
+          position={
+            currentIndex >= 0
+              ? { index: currentIndex + 1, total: openableSlugs.length }
+              : undefined
+          }
         />
       )}
     </div>
@@ -196,7 +209,10 @@ function ResultCard({
   onClick: () => void
   onRerun: () => void
 }) {
-  const filename = slug === '/' ? 'home.png' : `${slug.replace(/^\//, '').replace(/\//g, '-')}.png`
+  const filename =
+    slug === '/'
+      ? 'home.png'
+      : `${slug.replace(/^\//, '').replace(/\//g, '-')}.png`
   const diffUrl = `/api/image/${runId}/diffs/${filename}?v=${result?.version ?? 1}`
 
   const statusColors: Record<string, string> = {
@@ -204,10 +220,14 @@ function ResultCard({
     diff: 'border-red-500 bg-red-50',
     error: 'border-yellow-500 bg-yellow-50',
   }
-  const borderClass = pending ? 'border-gray-200 bg-gray-50' : statusColors[result!.status]
+  const borderClass = pending
+    ? 'border-gray-200 bg-gray-50'
+    : statusColors[result!.status]
 
   return (
-    <div className={`relative p-3 rounded-lg border-2 ${borderClass} transition-shadow ${checked ? 'opacity-60' : ''}`}>
+    <div
+      className={`relative p-3 rounded-lg border-2 ${borderClass} transition-shadow ${checked ? 'opacity-60' : ''}`}
+    >
       {checked && (
         <span
           className="absolute top-1.5 right-1.5 z-10 w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center shadow"
@@ -216,13 +236,21 @@ function ResultCard({
           <Check className="w-3 h-3" strokeWidth={3} />
         </span>
       )}
-      <button onClick={onClick} disabled={pending} className="w-full text-left disabled:cursor-default">
+      <button
+        onClick={onClick}
+        disabled={pending}
+        className="w-full text-left disabled:cursor-default"
+      >
         {pending ? (
           <div className="aspect-video rounded mb-2 bg-gray-200 animate-pulse" />
         ) : (
           result!.status !== 'error' && (
             <div className="aspect-video bg-gray-100 rounded mb-2 overflow-hidden">
-              <img src={diffUrl} alt={`Diff for ${slug}`} className="w-full h-full object-cover object-top" />
+              <img
+                src={diffUrl}
+                alt={`Diff for ${slug}`}
+                className="w-full h-full object-cover object-top"
+              />
             </div>
           )
         )}
@@ -231,10 +259,14 @@ function ResultCard({
           <div className="mt-1 h-3 w-16 rounded bg-gray-200 animate-pulse" />
         ) : (
           <div className="text-xs text-gray-500 mt-1 break-words">
-            {result!.status === 'error' ? result!.error : `${result!.mismatchPercent.toFixed(2)}% diff`}
+            {result!.status === 'error'
+              ? result!.error
+              : `${result!.mismatchPercent.toFixed(2)}% diff`}
           </div>
         )}
-        {!pending && result!.sizeDiff && <div className="text-xs text-yellow-600 mt-1">Size differs</div>}
+        {!pending && result!.sizeDiff && (
+          <div className="text-xs text-yellow-600 mt-1">Size differs</div>
+        )}
       </button>
       {!pending && result!.status === 'error' && (
         <button

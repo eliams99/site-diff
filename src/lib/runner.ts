@@ -1,6 +1,11 @@
 import { takeScreenshot, closeBrowser } from './screenshotter'
 import { diffImages, determineStatus } from './differ'
-import { getMetadata, saveMetadata, getDiffPath, getScreenshotPath } from './storage'
+import {
+  getMetadata,
+  saveMetadata,
+  getDiffPath,
+  getScreenshotPath,
+} from './storage'
 import { mapWithConcurrency } from './concurrency'
 import { DEFAULT_CONCURRENCY } from './types'
 import type { ComparisonRun, PageResult } from './types'
@@ -29,10 +34,26 @@ function saveLockFor(runId: string) {
   return m
 }
 
+/**
+ * Run a read-modify-write of a run's meta.json under its save-mutex, so callers
+ * outside the runner (re-run, mark-checked) can't clobber a result an in-flight
+ * appendResult is writing. Always re-read via getMetadata inside `fn`.
+ */
+export function withRunLock<T>(
+  runId: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  return saveLockFor(runId)(fn)
+}
+
 // Keep the shared browser open while any run is in flight.
 let activeRuns = 0
 
-async function compareSlug(run: ComparisonRun, slug: string, version: number): Promise<PageResult> {
+async function compareSlug(
+  run: ComparisonRun,
+  slug: string,
+  version: number,
+): Promise<PageResult> {
   const { id: runId, baseUrlA, baseUrlB, config } = run
   const urlA = new URL(slug, baseUrlA).toString()
   const urlB = new URL(slug, baseUrlB).toString()
@@ -111,10 +132,15 @@ export function startRun(run: ComparisonRun, slugs: string[]): void {
       })
     } finally {
       // Always finalize, even if a slug's appendResult rejected, so the run
-      // never stays 'running' forever.
-      await finalizeStatus(run.id)
-      activeRuns--
-      if (activeRuns === 0) await closeBrowser()
+      // never stays 'running' forever. The inner finally guarantees the
+      // activeRuns bookkeeping and browser close still run if finalizeStatus
+      // itself throws (e.g. disk full), so a run can't leak the shared browser.
+      try {
+        await finalizeStatus(run.id)
+      } finally {
+        activeRuns--
+        if (activeRuns === 0) await closeBrowser()
+      }
     }
   })()
 }

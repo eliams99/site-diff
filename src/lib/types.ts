@@ -46,5 +46,8 @@ export const DEFAULT_CONCURRENCY = 3
 /** Clamp a requested concurrency to [1, MAX_CONCURRENCY], falling back to the
  * default for missing/invalid values (0, NaN, undefined). */
 export function clampConcurrency(value: number | undefined): number {
-  return Math.min(Math.max(1, Number(value) || DEFAULT_CONCURRENCY), MAX_CONCURRENCY)
+  return Math.min(
+    Math.max(1, Number(value) || DEFAULT_CONCURRENCY),
+    MAX_CONCURRENCY,
+  )
 }

@@ -81,8 +81,23 @@ export default function CompareForm() {
   // Save to localStorage on change
   useEffect(() => {
     if (!mounted) return
-    saveToStorage({ baseUrlA, baseUrlB, slugsText, sitemapUrl, clickSelectorsText, concurrency })
-  }, [baseUrlA, baseUrlB, slugsText, sitemapUrl, clickSelectorsText, concurrency, mounted])
+    saveToStorage({
+      baseUrlA,
+      baseUrlB,
+      slugsText,
+      sitemapUrl,
+      clickSelectorsText,
+      concurrency,
+    })
+  }, [
+    baseUrlA,
+    baseUrlB,
+    slugsText,
+    sitemapUrl,
+    clickSelectorsText,
+    concurrency,
+    mounted,
+  ])
 
   const handleFetchSitemap = async () => {
     if (!sitemapUrl) return
@@ -90,7 +105,9 @@ export default function CompareForm() {
     setError('')
 
     try {
-      const res = await fetch(`/api/sitemap?url=${encodeURIComponent(sitemapUrl)}`)
+      const res = await fetch(
+        `/api/sitemap?url=${encodeURIComponent(sitemapUrl)}`,
+      )
       const data = await res.json()
 
       if (data.error) {
@@ -188,7 +205,7 @@ export default function CompareForm() {
           value={slugsText}
           onChange={(e) => setSlugsText(e.target.value)}
           rows={6}
-          placeholder={"/\n/about\n/contact"}
+          placeholder={'/\n/about\n/contact'}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
         />
       </div>
@@ -216,64 +233,72 @@ export default function CompareForm() {
         </button>
       </div>
 
-      {sitemapSlugs.length > 0 && (() => {
-        const filtered = sitemapSlugs.filter((s) => s.includes(filterText.trim()))
-        return (
-          <div className="border border-gray-200 rounded-md p-3 space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-                placeholder="Filter slugs (e.g. /mba)"
-                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="button"
-                onClick={() => setSelectedSlugs((prev) => new Set([...prev, ...filtered]))}
-                className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-              >
-                Select all
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedSlugs((prev) => {
-                    const next = new Set(prev)
-                    filtered.forEach((s) => next.delete(s))
-                    return next
-                  })
-                }
-                className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-              >
-                Clear
-              </button>
+      {sitemapSlugs.length > 0 &&
+        (() => {
+          const filtered = sitemapSlugs.filter((s) =>
+            s.includes(filterText.trim()),
+          )
+          return (
+            <div className="border border-gray-200 rounded-md p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                  placeholder="Filter slugs (e.g. /mba)"
+                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedSlugs((prev) => new Set([...prev, ...filtered]))
+                  }
+                  className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                >
+                  Select all
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedSlugs((prev) => {
+                      const next = new Set(prev)
+                      filtered.forEach((s) => next.delete(s))
+                      return next
+                    })
+                  }
+                  className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                >
+                  Clear
+                </button>
+              </div>
+              <p className="text-xs text-gray-500">
+                {selectedSlugs.size} of {sitemapSlugs.length} selected
+              </p>
+              <div className="max-h-64 overflow-y-auto space-y-1">
+                {filtered.map((slug) => (
+                  <label
+                    key={slug}
+                    className="flex items-center gap-2 text-sm font-mono cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedSlugs.has(slug)}
+                      onChange={(e) =>
+                        setSelectedSlugs((prev) => {
+                          const next = new Set(prev)
+                          if (e.target.checked) next.add(slug)
+                          else next.delete(slug)
+                          return next
+                        })
+                      }
+                    />
+                    <span>{slug}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-            <p className="text-xs text-gray-500">
-              {selectedSlugs.size} of {sitemapSlugs.length} selected
-            </p>
-            <div className="max-h-64 overflow-y-auto space-y-1">
-              {filtered.map((slug) => (
-                <label key={slug} className="flex items-center gap-2 text-sm font-mono cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedSlugs.has(slug)}
-                    onChange={(e) =>
-                      setSelectedSlugs((prev) => {
-                        const next = new Set(prev)
-                        if (e.target.checked) next.add(slug)
-                        else next.delete(slug)
-                        return next
-                      })
-                    }
-                  />
-                  <span>{slug}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )
-      })()}
+          )
+        })()}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -283,11 +308,12 @@ export default function CompareForm() {
           value={clickSelectorsText}
           onChange={(e) => setClickSelectorsText(e.target.value)}
           rows={2}
-          placeholder={"#onetrust-accept-btn-handler"}
+          placeholder={'#onetrust-accept-btn-handler'}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
         />
         <p className="mt-1 text-xs text-gray-500">
-          Clicked after load to close consent banners / modals. Missing elements are skipped. Works across different domains.
+          Clicked after load to close consent banners / modals. Missing elements
+          are skipped. Works across different domains.
         </p>
       </div>
 
@@ -307,7 +333,8 @@ export default function CompareForm() {
         />
         <p className="mt-1 text-xs text-gray-500">
           How many pages to compare at once. Each one renders 2 screenshots in
-          parallel, so higher values use more CPU. Lower it if your machine runs hot.
+          parallel, so higher values use more CPU. Lower it if your machine runs
+          hot.
         </p>
       </div>
 

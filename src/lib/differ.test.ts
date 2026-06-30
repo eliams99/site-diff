@@ -35,7 +35,7 @@ describe('diffImages two-color overlay', () => {
     const b = path.join(tmp, 'b1.png')
     const out = path.join(tmp, 'd1.png')
     await writeSolid(a, 255, 255, 255) // A white
-    await writeSolid(b, 0, 0, 0)       // B black -> B darker -> added
+    await writeSolid(b, 0, 0, 0) // B black -> B darker -> added
     await diffImages(a, b, out, 0.1)
     expect(await centerPixel(out)).toEqual([0, 180, 80])
   })
@@ -45,7 +45,7 @@ describe('diffImages two-color overlay', () => {
     const a = path.join(tmp, 'a2.png')
     const b = path.join(tmp, 'b2.png')
     const out = path.join(tmp, 'd2.png')
-    await writeSolid(a, 0, 0, 0)       // A black
+    await writeSolid(a, 0, 0, 0) // A black
     await writeSolid(b, 255, 255, 255) // B white -> B lighter -> removed
     await diffImages(a, b, out, 0.1)
     expect(await centerPixel(out)).toEqual([255, 0, 0])

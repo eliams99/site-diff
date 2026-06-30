@@ -6,7 +6,7 @@ import type { PageResult } from './types'
 // Diff overlay colors. pixelmatch uses diffColorAlt when the pixel is darker
 // in B than in A, and diffColor otherwise.
 const DIFF_COLOR_REMOVED: [number, number, number] = [255, 0, 0] // B lighter than A
-const DIFF_COLOR_ADDED: [number, number, number] = [0, 180, 80]  // B darker than A
+const DIFF_COLOR_ADDED: [number, number, number] = [0, 180, 80] // B darker than A
 
 export interface DiffResult {
   mismatchPixels: number
@@ -18,7 +18,7 @@ export async function diffImages(
   imgPathA: string,
   imgPathB: string,
   diffOutputPath: string,
-  threshold: number = 0.1
+  threshold: number = 0.1,
 ): Promise<DiffResult> {
   const [bufferA, bufferB] = await Promise.all([
     fs.readFile(imgPathA),
@@ -50,7 +50,7 @@ export async function diffImages(
       threshold,
       diffColor: DIFF_COLOR_REMOVED,
       diffColorAlt: DIFF_COLOR_ADDED,
-    }
+    },
   )
 
   await fs.writeFile(diffOutputPath, PNG.sync.write(diff))
@@ -66,7 +66,11 @@ function padImage(img: PNG, targetWidth: number, targetHeight: number): PNG {
     return img
   }
 
-  const padded = new PNG({ width: targetWidth, height: targetHeight, fill: true })
+  const padded = new PNG({
+    width: targetWidth,
+    height: targetHeight,
+    fill: true,
+  })
 
   // Fill with opaque white. Buffer.fill(255) is a native memset — sets every
   // RGBA byte to 255 in one pass, far faster than a per-pixel JS loop on the

@@ -8,7 +8,12 @@ function makeRun(partial: Partial<ComparisonRun>): ComparisonRun {
     baseUrlA: 'https://a',
     baseUrlB: 'https://b',
     createdAt: '2026-06-25T10:00:00.000Z',
-    config: { viewport: { width: 1280, height: 720 }, fullPage: true, delay: 0, threshold: 0.1 },
+    config: {
+      viewport: { width: 1280, height: 720 },
+      fullPage: true,
+      delay: 0,
+      threshold: 0.1,
+    },
     slugs: ['/', '/about', '/contact'],
     results: [],
     status: 'running',
@@ -20,8 +25,23 @@ describe('getErrorSlugs', () => {
   it('returns only slugs whose result status is error', () => {
     const run = makeRun({
       results: [
-        { slug: '/', mismatchPixels: 0, mismatchPercent: 0, status: 'match', sizeDiff: false, version: 1 },
-        { slug: '/about', mismatchPixels: 0, mismatchPercent: 0, status: 'error', sizeDiff: false, version: 1, error: 'boom' },
+        {
+          slug: '/',
+          mismatchPixels: 0,
+          mismatchPercent: 0,
+          status: 'match',
+          sizeDiff: false,
+          version: 1,
+        },
+        {
+          slug: '/about',
+          mismatchPixels: 0,
+          mismatchPercent: 0,
+          status: 'error',
+          sizeDiff: false,
+          version: 1,
+          error: 'boom',
+        },
       ],
     })
     expect(getErrorSlugs(run)).toEqual(['/about'])
@@ -32,16 +52,33 @@ describe('getPendingSlugs', () => {
   it('returns target slugs that have no result yet', () => {
     const run = makeRun({
       results: [
-        { slug: '/', mismatchPixels: 0, mismatchPercent: 0, status: 'match', sizeDiff: false, version: 1 },
+        {
+          slug: '/',
+          mismatchPixels: 0,
+          mismatchPercent: 0,
+          status: 'match',
+          sizeDiff: false,
+          version: 1,
+        },
       ],
     })
     expect(getPendingSlugs(run)).toEqual(['/about', '/contact'])
   })
 
   it('falls back to result slugs when slugs is missing (legacy runs)', () => {
-    const run = makeRun({ slugs: undefined as unknown as string[], results: [
-      { slug: '/', mismatchPixels: 0, mismatchPercent: 0, status: 'match', sizeDiff: false, version: 1 },
-    ] })
+    const run = makeRun({
+      slugs: undefined as unknown as string[],
+      results: [
+        {
+          slug: '/',
+          mismatchPixels: 0,
+          mismatchPercent: 0,
+          status: 'match',
+          sizeDiff: false,
+          version: 1,
+        },
+      ],
+    })
     expect(getPendingSlugs(run)).toEqual([])
   })
 })

@@ -16,12 +16,15 @@ export async function generateMetadata({
   if (!run) return { title: 'Run not found · Site Diff' }
   const d = new Date(run.createdAt)
   const date = d.toLocaleDateString('en-GB')
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  const time = d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
   return { title: `${date} ${time} · Site Diff` }
 }
 
 export default async function RunPage({
-  params
+  params,
 }: {
   params: Promise<{ id: string }>
 }) {
@@ -51,7 +54,7 @@ export default async function RunPage({
           </div>
         </div>
         <Link
-          href={`/?baseUrlA=${encodeURIComponent(run.baseUrlA)}&baseUrlB=${encodeURIComponent(run.baseUrlB)}&slugs=${encodeURIComponent(run.results.map(r => r.slug).join(','))}`}
+          href={`/?baseUrlA=${encodeURIComponent(run.baseUrlA)}&baseUrlB=${encodeURIComponent(run.baseUrlB)}&slugs=${encodeURIComponent(run.results.map((r) => r.slug).join(','))}`}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
         >
           Run Again
